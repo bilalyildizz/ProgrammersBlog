@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -12,6 +13,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.ViewComponents
 {
     //ViewComponent sınıfı Vİews>Shared>Components>AdminMenu>Default.cshtml sayfasını arıyor ve direk oraya bu modeli dönüyor. BU sayede direk o view içierisinde tekrar
     //controller isteği yapmadan direk kullanıcının rollerini kontrol ederek ona göre kategoride neleerin gösterileceğiniz belirleyebiliyoruz.
+    [Authorize]
     public class AdminMenuViewComponent:ViewComponent
     {
         private readonly UserManager<User> _userManager;

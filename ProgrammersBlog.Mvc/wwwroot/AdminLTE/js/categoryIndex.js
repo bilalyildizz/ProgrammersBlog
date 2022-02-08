@@ -451,7 +451,7 @@
             });
 
         /* Ajax POST / Updating a Category starts from here */
-
+        
         placeHolderDiv.on('click',
             '#btnUpdate',
             function (event) {

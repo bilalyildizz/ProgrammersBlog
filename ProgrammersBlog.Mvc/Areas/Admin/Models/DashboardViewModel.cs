@@ -12,6 +12,6 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Models
         public int ArticlesCount { get; set; }
         public int CommentsCount { get; set; }
         public int UsersCount { get; set; }
-        public ArticleListDto Articels { get; set; }
+        public ArticleListDto Articles { get; set; }
     }
 }

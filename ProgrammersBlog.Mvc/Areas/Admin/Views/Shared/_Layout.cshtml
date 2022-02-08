@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="utf-8" />
@@ -7,7 +8,10 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title> @ViewBag.Title - Admin Paneli | Programmers Blog</title>
-   @await Html.PartialAsync("_LayoutCssPartial");
+    @await Html.PartialAsync("_LayoutCssPartial");
+    @await RenderSectionAsync("Styles", false);
+    <!-- Sayfalara özel csss eklediğimiz için önce onların çalışmasını daha sonra bu css in üzerine eklenmesini sağlıyoruz.-->
+    <link href="~/AdminLTE/css/site.css" rel="stylesheet" />
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -23,6 +27,7 @@
             </div>
         </form>
         <!-- Navbar-->
+        
         @await Component.InvokeAsync("UserMenu")
     </nav>
 <div id="layoutSidenav">

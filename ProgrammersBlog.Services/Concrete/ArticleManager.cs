@@ -44,6 +44,21 @@ namespace ProgrammersBlog.Services.Concrete
 
         }
 
+        public async Task<IDataResult<ArticleUpdateDto>> GetArticleUpdateDtoAsync(int articleId)
+        {
+            var result = await _unitOfWork.Articles.AnyAsync(a => a.Id == articleId);
+            if (result)
+            {
+                var article = await _unitOfWork.Articles.GetAsync(a => a.Id == articleId);
+                var articleUpdateDto = _mapper.Map<ArticleUpdateDto>(article);
+                return new DataResult<ArticleUpdateDto>(ResultStatus.Success, articleUpdateDto);
+            }
+            else
+            {
+                return new DataResult<ArticleUpdateDto>(ResultStatus.Error, Messages.Category.NotFound(isPlural: false), null);
+            }
+        }
+
         public async Task<IDataResult<ArticleListDto>> GetAllAsync()
         {
             var articles = await _unitOfWork.Articles.GetAllAsync(null, ar => ar.Category, ar => ar.User);
@@ -112,12 +127,12 @@ namespace ProgrammersBlog.Services.Concrete
 
         }
 
-        public async Task<IResult> AddAsync(ArticleAddDto articleAddDto, string createdByName)
+        public async Task<IResult> AddAsync(ArticleAddDto articleAddDto, string createdByName,int userId)
         {
             var article = _mapper.Map<Article>(articleAddDto);
             article.CreatedByName = createdByName;
             article.ModifiedByName = createdByName;
-            article.UserId = 1;
+            article.UserId = userId;
             await _unitOfWork.Articles.AddAsync(article);
             await _unitOfWork.SaveAsync();
             return new Result(ResultStatus.Success, Messages.Article.Add(article.Title));
@@ -125,7 +140,8 @@ namespace ProgrammersBlog.Services.Concrete
 
         public async Task<IResult> UpdateAsync(ArticleUpdateDto articleAUpdateDto, string modifiedByName)
         {
-            var article = _mapper.Map<Article>(articleAUpdateDto);
+            var oldArticle = await _unitOfWork.Articles.GetAsync(a=>a.Id==articleAUpdateDto.Id);
+            var article = _mapper.Map<ArticleUpdateDto, Article>(articleAUpdateDto, oldArticle);
             article.ModifiedByName = modifiedByName;
             await _unitOfWork.Articles.UpdateAsync(article);
             await _unitOfWork.SaveAsync();

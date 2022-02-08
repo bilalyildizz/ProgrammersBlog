@@ -45,7 +45,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             {
                 return View(new DashboardViewModel
                 {
-                    Articels = articlesResult.Data,
+                    Articles = articlesResult.Data,
                     ArticlesCount = articlesCountResult.Data,
                     CategoriesCount = categoriesCountResult.Data,
                     CommentsCount = commentsCountResult.Data,

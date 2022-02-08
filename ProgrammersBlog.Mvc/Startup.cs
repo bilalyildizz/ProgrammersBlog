@@ -15,6 +15,7 @@ using ProgrammersBlog.Data.Concrete.EntityFramework.Contexts;
 using ProgrammersBlog.Mvc.AutoMapper.Profiles;
 using ProgrammersBlog.Mvc.Helpers;
 using ProgrammersBlog.Mvc.Helpers.Abstract;
+using ProgrammersBlog.Mvc.Helpers.Concrete;
 using ProgrammersBlog.Services.AutoMapper.Profiles;
 using ProgrammersBlog.Services.Extensions;
 
@@ -38,7 +39,7 @@ namespace ProgrammersBlog.Mvc
                 opt.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter())
             );
             services.AddSession();
-            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile),typeof(UserProfile));
+            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile),typeof(UserProfile), typeof(ViewModelsProfile));
 
             //Bi<im service/Extensions kýsmýnda oluþturduðumuz dosya. Ýnterface leri vs vermek için.
             services.LoadMyServices(Configuration.GetConnectionString(name:"LocalDB"));

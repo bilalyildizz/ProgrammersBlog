@@ -39,7 +39,7 @@ namespace ProgrammersBlog.Mvc
                 opt.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter())
             ).AddNToastNotifyToastr();
             services.AddSession();
-            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile),typeof(UserProfile), typeof(ViewModelsProfile));
+            services.AddAutoMapper(typeof(CategoryProfile), typeof(CommentProfile) ,typeof(ArticleProfile),typeof(UserProfile), typeof(ViewModelsProfile));
 
             //Bi<im service/Extensions kýsmýnda oluþturduðumuz dosya. Ýnterface leri vs vermek için.
             services.LoadMyServices(Configuration.GetConnectionString(name:"LocalDB"));

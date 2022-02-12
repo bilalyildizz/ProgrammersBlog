@@ -37,7 +37,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
         {
             var categoriesCountResult = await _categoryService.CountByNonDeleted();
             var articlesCountResult = await _articleService.CountByNonDeleted();
-            var commentsCountResult = await _commentService.CountByNonDeleted();
+            var commentsCountResult = await _commentService.CountByNonDeletedAsync();
             var userCount = await _userManager.Users.CountAsync();
             var articlesResult = await _articleService.GetAllAsync();
 

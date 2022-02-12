@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using NToastNotify;
 using ProgrammersBlog.Data.Migrations;
 using ProgrammersBlog.Entities.ComplexTypes;
 using ProgrammersBlog.Entities.Concrete;
@@ -23,13 +25,14 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly ICategoryService _categoryService;
+        private readonly IToastNotification _toastNotification;
 
 
-        public ArticleController(IArticleService articleService, ICategoryService categoryService, UserManager<User> userManager, IMapper mapper, IImageHelper imageHelper) : base(userManager, mapper, imageHelper)
+        public ArticleController(IArticleService articleService, ICategoryService categoryService, UserManager<User> userManager, IMapper mapper, IImageHelper imageHelper, IToastNotification toastNotification) : base(userManager, mapper, imageHelper)
         {
             _articleService = articleService;
             _categoryService = categoryService;
-
+            _toastNotification = toastNotification;
         }
 
         [HttpGet]
@@ -68,7 +71,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 var result = await _articleService.AddAsync(articleAddDto, LoggedInUser.UserName, LoggedInUser.Id);
                 if (result.ResultStatus == ResultStatus.Success)
                 {
-                    TempData.Add("SuccessMessage", result.Message);
+                    _toastNotification.AddSuccessToastMessage(result.Message);
                     return RedirectToAction("Index", "Article");
                 }
                 else
@@ -128,7 +131,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                     {
                         ImageHelper.Delete(oldThumbnail);
                     }
-                    TempData.Add("SuccessMessage", result.Message);
+                    _toastNotification.AddSuccessToastMessage(result.Message);
                     return RedirectToAction("Index", "Article");
                 }
                 else
@@ -148,6 +151,17 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             var result = await _articleService.DeleteAsync(articleId, LoggedInUser.UserName);
             var articleResult = JsonSerializer.Serialize(result);
             return Json(articleResult);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetAllArticles()
+        {
+            var articles = _articleService.GetAllByNonDeletedAndActiveAsync();
+            var articlesResult = JsonSerializer.Serialize(articles, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            });
+            return Json(articlesResult);
         }
 
     }

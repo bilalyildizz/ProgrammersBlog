@@ -14,13 +14,14 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using NToastNotify;
 using ProgrammersBlog.Entities.ComplexTypes;
 using ProgrammersBlog.Mvc.Areas.Admin.Models;
 using ProgrammersBlog.Mvc.Helpers.Abstract;
 
 namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 {
-    
+
     [Area("Admin")]
     public class UserController : Controller
     {
@@ -28,16 +29,18 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly IImageHelper _imageHelper;
+        private readonly IToastNotification _toastNotification;
 
-        public UserController(UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager, IImageHelper imageHelper)
+        public UserController(UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager, IImageHelper imageHelper, IToastNotification toastNotification)
         {
             _userManager = userManager;
-           
+
             _mapper = mapper;
             _signInManager = signInManager;
             _imageHelper = imageHelper;
+            _toastNotification = toastNotification;
         }
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -58,7 +61,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(userLoginDto.Email);
-                if (user!=null)
+                if (user != null)
                 {
                     var result = await _signInManager.PasswordSignInAsync(user, userLoginDto.Password,
                         userLoginDto.RememberMe, false);
@@ -68,7 +71,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("","E-posta adresiniz veya şifreniz yanlıştır.");
+                        ModelState.AddModelError("", "E-posta adresiniz veya şifreniz yanlıştır.");
                         return View("UserLogin");
                     }
                 }
@@ -82,14 +85,14 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             {
                 return View("UserLogin");
             }
-            
+
         }
 
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             //Çıkış yapınca blog sayfasına direk yönlendiriyor.Son paramete olarak area admin kısmına değil normal kullanıcı tarafına gitmesini sağlıyruz.
-            return RedirectToAction("Index", "Home", new {Area = ""});
+            return RedirectToAction("Index", "Home", new { Area = "" });
         }
 
 
@@ -104,11 +107,11 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
         public async Task<JsonResult> GetAllUsers()
         {
             var users = await _userManager.Users.ToListAsync();
-            var userListDto =JsonSerializer.Serialize(new UserListDto
+            var userListDto = JsonSerializer.Serialize(new UserListDto
             {
                 Users = users,
                 ResultStatus = ResultStatus.Success
-            },new JsonSerializerOptions
+            }, new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             });
@@ -126,7 +129,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var uploadedImageDtoResult = await _imageHelper.Upload(userAddDto.UserName,userAddDto.PictureFile,PictureType.User);
+                var uploadedImageDtoResult = await _imageHelper.Upload(userAddDto.UserName, userAddDto.PictureFile, PictureType.User);
                 userAddDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                     ? uploadedImageDtoResult.Data.FullName
                     : "userImages/defaultUser.png";
@@ -150,7 +153,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError("",error.Description);
+                        ModelState.AddModelError("", error.Description);
                     }
 
                     var userAddAjaxErrorModel = JsonSerializer.Serialize(new UserAddAjaxViewModel
@@ -160,7 +163,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                     });
                     return Json(userAddAjaxErrorModel);
                 }
-                
+
             }
             var userAddAjaxModelStateErrorModel = JsonSerializer.Serialize(new UserAddAjaxViewModel
             {
@@ -220,9 +223,9 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 bool isNewPictureUploaded = false;
                 var oldUser = await _userManager.FindByIdAsync(userUpdateDto.Id.ToString());
                 var oldUserPicture = oldUser.Picture;
-                if (userUpdateDto.PictureFile!=null)
+                if (userUpdateDto.PictureFile != null)
                 {
-                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile,PictureType.User);
+                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile, PictureType.User);
                     userUpdateDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                         ? uploadedImageDtoResult.Data.FullName
                         : "userImages/defaultUser.png";
@@ -232,7 +235,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                     }
                 }
 
-                var updatedUser = _mapper.Map<UserUpdateDto,User> (userUpdateDto,oldUser);
+                var updatedUser = _mapper.Map<UserUpdateDto, User>(userUpdateDto, oldUser);
                 var result = await _userManager.UpdateAsync(updatedUser);
                 if (result.Succeeded)
                 {
@@ -257,7 +260,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError("",error.Description);
+                        ModelState.AddModelError("", error.Description);
                     }
                     var userUpdateErorViewModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
                     {
@@ -299,7 +302,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 var oldUserPicture = oldUser.Picture;
                 if (userUpdateDto.PictureFile != null)
                 {
-                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile,PictureType.User);
+                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile, PictureType.User);
                     userUpdateDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                         ? uploadedImageDtoResult.Data.FullName
                         : "userImages/defaultUser.png";
@@ -307,7 +310,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                     {
                         isNewPictureUploaded = true;
                     }
-                    
+
                 }
 
                 var updatedUser = _mapper.Map<UserUpdateDto, User>(userUpdateDto, oldUser);
@@ -319,8 +322,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                         _imageHelper.Delete(oldUserPicture);
                     }
 
-                    TempData.Add("SuccessMessage",
-                        $"{userUpdateDto.UserName} adlı kullanıcı bilgileri başarıyla güncellenmiştir.");
+                    _toastNotification.AddSuccessToastMessage($"{userUpdateDto.UserName} adlı kullanıcı bilgileri başarıyla güncellenmiştir.");
 
                     return View(userUpdateDto);
                 }
@@ -364,14 +366,18 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                         await _userManager.UpdateSecurityStampAsync(user);
                         await _signInManager.SignOutAsync();
                         await _signInManager.PasswordSignInAsync(user, userPasswordChangeDto.NewPassword, true, false);
-                        TempData.Add("SuccessMessage", $"Şifreniz başarıyla değiştirilmiştir.");
+                        _toastNotification.AddSuccessToastMessage("Şifreniz başarıyla değiştirilmiştir.", new ToastrOptions()
+                        {
+                            CloseButton = true,
+                            Title = "Başarılı İşlem!"
+                        });
                         return View();
                     }
                     else
                     {
                         foreach (var error in result.Errors)
                         {
-                            ModelState.AddModelError("",error.Description);
+                            ModelState.AddModelError("", error.Description);
                         }
 
                         return View(userPasswordChangeDto);
@@ -388,10 +394,10 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
                 return View(userPasswordChangeDto);
             }
 
-            
+
         }
 
-   
-  
+
+
     }
 }

@@ -37,7 +37,7 @@ namespace ProgrammersBlog.Mvc
             //Add json options ekleme nedenimiz controllerdan  viewa model dönerken javascriptin bu modeli tanýmasý için json formata çevirmemiz gerekmesi.
             services.AddControllersWithViews().AddRazorRuntimeCompilation().AddJsonOptions(opt=>
                 opt.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter())
-            );
+            ).AddNToastNotifyToastr();
             services.AddSession();
             services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile),typeof(UserProfile), typeof(ViewModelsProfile));
 
@@ -95,7 +95,7 @@ namespace ProgrammersBlog.Mvc
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseNToastNotify();
             app.UseEndpoints(endpoints =>
             {
                 //Admin area ile article sayfasýna girdiðimizde articels üzerinde deðiþiklik yapabileceðiz. Fakat normal kullanýcý girdiðinde sadece okuyabilecek.

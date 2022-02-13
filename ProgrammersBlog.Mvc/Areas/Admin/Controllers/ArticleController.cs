@@ -7,9 +7,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using NToastNotify;
-using ProgrammersBlog.Data.Migrations;
 using ProgrammersBlog.Entities.ComplexTypes;
 using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Entities.Dtos;
@@ -34,6 +34,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             _categoryService = categoryService;
             _toastNotification = toastNotification;
         }
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -42,7 +43,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             if (result.ResultStatus == ResultStatus.Success) return View(result.Data);
             return NotFound();
         }
-
+        [Authorize(Roles = "SuperAdmin,Article.Create")]
         [HttpGet]
         public async Task<IActionResult> Add()
         {
@@ -57,6 +58,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 
             return NotFound();
         }
+        [Authorize(Roles = "SuperAdmin,Article.Create")]
         [HttpPost]
         public async Task<IActionResult> Add(ArticleAddViewModel articleAddViewModel)
         {
@@ -85,7 +87,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             return View(articleAddViewModel);
 
         }
-
+        [Authorize(Roles = "SuperAdmin,Article.Update")]
         [HttpGet]
         public async Task<IActionResult> Update(int articleId)
         {
@@ -103,7 +105,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             }
 
         }
-
+        [Authorize(Roles = "SuperAdmin,Article.Update")]
         [HttpPost]
         public async Task<IActionResult> Update(ArticleUpdateViewModel articleUpdateViewModel)
         {
@@ -144,7 +146,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             articleUpdateViewModel.Categories = categories.Data.Categories;
             return View(articleUpdateViewModel);
         }
-
+        [Authorize(Roles = "SuperAdmin,Article.Delete")]
         [HttpPost]
         public async Task<JsonResult> Delete(int articleId)
         {
@@ -152,11 +154,12 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             var articleResult = JsonSerializer.Serialize(result);
             return Json(articleResult);
         }
+        [Authorize(Roles = "SuperAdmin,Article.Read")]
 
         [HttpGet]
         public async Task<JsonResult> GetAllArticles()
         {
-            var articles = _articleService.GetAllByNonDeletedAndActiveAsync();
+            var articles = await _articleService.GetAllByNonDeletedAndActiveAsync();
             var articlesResult = JsonSerializer.Serialize(articles, new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve

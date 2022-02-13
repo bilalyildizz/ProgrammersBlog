@@ -10,14 +10,24 @@ using ProgrammersBlog.Entities.Concrete;
 
 namespace ProgrammersBlog.Data.Concrete.EntityFramework.Mappings
 {
-    //Map dosyaları ilk veritabanı oluşturulurken ve her migration işlemlerli yapıldığında çalışıyor.
     public class UserMap:IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-
             builder.Property(u => u.Picture).IsRequired();
             builder.Property(u => u.Picture).HasMaxLength(250);
+            // Social Media Links
+            builder.Property(u => u.YoutubeLink).HasMaxLength(250);
+            builder.Property(u => u.TwitterLink).HasMaxLength(250);
+            builder.Property(u => u.InstagramLink).HasMaxLength(250);
+            builder.Property(u => u.FacebookLink).HasMaxLength(250);
+            builder.Property(u => u.LinkedInLink).HasMaxLength(250);
+            builder.Property(u => u.GitHubLink).HasMaxLength(250);
+            builder.Property(u => u.WebsiteLink).HasMaxLength(250);
+            // About
+            builder.Property(u => u.FirstName).HasMaxLength(30);
+            builder.Property(u => u.LastName).HasMaxLength(30);
+            builder.Property(u => u.About).HasMaxLength(1000);
 
             // Primary key
             builder.HasKey(u => u.Id);
@@ -27,7 +37,7 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Mappings
             builder.HasIndex(u => u.NormalizedEmail).HasDatabaseName("EmailIndex");
 
             // Maps to the AspNetUsers table
-            builder.ToTable("AspNetUsers");
+            builder.ToTable("Users");
 
             // A concurrency token for use with the optimistic concurrency checking
             builder.Property(u => u.ConcurrencyStamp).IsConcurrencyToken();
@@ -53,7 +63,6 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Mappings
             // Each User can have many entries in the UserRole join table
             builder.HasMany<UserRole>().WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
 
-
             var adminUser = new User
             {
                 Id = 1,
@@ -62,15 +71,22 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Mappings
                 Email = "adminuser@gmail.com",
                 NormalizedEmail = "ADMINUSER@GMAIL.COM",
                 PhoneNumber = "+905555555555",
-                Picture="defaultUser.png",
-                EmailConfirmed=true,
-                PhoneNumberConfirmed=true,
-                //Güvenlik değeri
-                SecurityStamp = Guid.NewGuid().ToString(),
-
+                Picture = "/userImages/defaultUser.png",
+                FirstName = "Admin",
+                LastName = "User",
+                About = "Admin User of ProgrammersBlog",
+                TwitterLink = "https://twitter.com/adminuser",
+                InstagramLink = "https://instagram.com/adminuser",
+                YoutubeLink = "https://youtube.com/adminuser",
+                GitHubLink = "https://github.com/adminuser",
+                LinkedInLink = "https://linkedin.com/adminuser",
+                WebsiteLink = "https://programmersblog.com/",
+                FacebookLink = "https://facebook.com/adminuser",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
             };
             adminUser.PasswordHash = CreatePasswordHash(adminUser, "adminuser");
-
             var editorUser = new User
             {
                 Id = 2,
@@ -79,23 +95,30 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Mappings
                 Email = "editoruser@gmail.com",
                 NormalizedEmail = "EDITORUSER@GMAIL.COM",
                 PhoneNumber = "+905555555555",
-
-                Picture = "defaultUser.png",
+                Picture = "/userImages/defaultUser.png",
+                FirstName = "Admin",
+                LastName = "User",
+                About = "Editor User of ProgrammersBlog",
+                TwitterLink = "https://twitter.com/editoruser",
+                InstagramLink = "https://instagram.com/editoruser",
+                YoutubeLink = "https://youtube.com/editoruser",
+                GitHubLink = "https://github.com/editoruser",
+                LinkedInLink = "https://linkedin.com/editoruser",
+                WebsiteLink = "https://programmersblog.com/",
+                FacebookLink = "https://facebook.com/editoruser",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                //Güvenlik değeri
                 SecurityStamp = Guid.NewGuid().ToString()
             };
             editorUser.PasswordHash = CreatePasswordHash(editorUser, "editoruser");
 
-            //Eğer veritabanında user tablosunda hiç veri yok ise ekleme işlemini yapıyor.
             builder.HasData(adminUser, editorUser);
         }
 
-        private string CreatePasswordHash(User user, string password)
+        private string CreatePasswordHash(User user,string password)
         {
             var passwordHasher = new PasswordHasher<User>();
-            return passwordHasher.HashPassword(user, password);
+            return passwordHasher.HashPassword(user,password );
         }
     }
 }

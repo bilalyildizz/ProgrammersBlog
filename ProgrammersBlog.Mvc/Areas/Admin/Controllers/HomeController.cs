@@ -15,7 +15,6 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 {
 
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor")]
 
     public class HomeController : Controller
     {
@@ -33,6 +32,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
             _categoryService = categoryService;
         }
 
+        [Authorize(Roles="SuperAdmin,AdminArea.Home.Read")]
         public async Task<IActionResult> Index()
         {
             var categoriesCountResult = await _categoryService.CountByNonDeleted();

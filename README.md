@@ -1,6 +1,6 @@
 # ProgrammersBlog
 - Yazılımcıların en güncel bilgileri öğrenebileceği blog sitesi.
-- Udemy eğitimimle beraber ilerlettiğim ASP.NET CORE MVC Projesi. Henüz Admin işlemlerini oluşturmaktayım.
+- Udemy eğitimimle beraber ilerlettiğim ASP.NET CORE MVC Projesi.
 - Proje boyunca kullanılan mimari yaklaşım ve teknik ve konseptler şunlardır.
   - N katmanlı mimari
   - EF Core 5.0

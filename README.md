@@ -2,8 +2,8 @@
 - Yazılımcıların en güncel bilgileri öğrenebileceği blog sitesi.
 - Udemy eğitimimle beraber ilerlettiğim ASP.NET CORE MVC Projesi. Henüz Admin işlemlerini oluşturmaktayım.
 - Proje boyunca kullanılan mimari yaklaşım ve teknik ve konseptler şunlardır.
--- N katmanlı mimari
--- EF Core 5.0
+  - N katmanlı mimari
+  - EF Core 5.0
 -- Fluent API
 - Unit Of Work pattern
 - Generic Repository pattern

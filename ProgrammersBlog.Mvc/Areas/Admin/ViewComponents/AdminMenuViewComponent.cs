@@ -23,11 +23,15 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.ViewComponents
             _userManager = userManager;
         }
 
-        public ViewViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
             //Async fonksiyon olmadığı için result larını aldık. HttpContext.User ile şuanki giriş yapmış kullanıcıya ulaşılabiliyor.
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
-            var roles = _userManager.GetRolesAsync(user).Result;
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var roles = await _userManager.GetRolesAsync(user);
+            if (user == null)
+                return Content("Kullanıcı Bulunamadı");
+            if (roles == null)
+                return Content("Rol Bulunamadı");
             return View(new UserWithRolesViewModel
             {
                 User=user,

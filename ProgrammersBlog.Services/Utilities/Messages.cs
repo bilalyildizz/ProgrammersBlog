@@ -27,6 +27,10 @@ namespace ProgrammersBlog.Services.Utilities
             {
                 return $"{categoryName} adlı kategori başarıyla silinmiştir.";
             }
+            public static string UndoDelete(string categoryName)
+            {
+                return $"{categoryName} isimli kategori başarıyla arşivden geri getirilmiştir.";
+            }
             public static string HardDelete(string categoryName)
             {
                 return $"{categoryName} isimli kategori başarıyla veritabanından silinmiştir.";
@@ -52,6 +56,10 @@ namespace ProgrammersBlog.Services.Utilities
             public static string Delete(string articleTitle)
             {
                 return $"{articleTitle} başlıklı makale başarıyla silinmiştir.";
+            }
+            public static string UndoDelete(string articleTitle)
+            {
+                return $"{articleTitle} başlıklı makale başarıyla arşivden getirilmiştir";
             }
             public static string HardDelete(string articleTitle)
             {
@@ -83,6 +91,11 @@ namespace ProgrammersBlog.Services.Utilities
             {
                 return $"{createdByName} tarafından eklenen yorum başarıyla silinmiştir.";
             }
+            public static string UndoDelete(string createdByName)
+            {
+                return $"{createdByName} tarafından eklenen yorum başarıyla arşivden getirilmiştir.";
+            }
+
             public static string HardDelete(string createdByName)
             {
                 return $"{createdByName} tarafından eklenen yorum başarıyla veritabanından silinmiştir.";

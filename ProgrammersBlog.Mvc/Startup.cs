@@ -35,14 +35,18 @@ namespace ProgrammersBlog.Mvc
         {
             //mvc uygulamasý olduðunu bu kod ile belirtiyoruz.
             //Add json options ekleme nedenimiz controllerdan  viewa model dönerken javascriptin bu modeli tanýmasý için json formata çevirmemiz gerekmesi.
-            services.AddControllersWithViews().AddRazorRuntimeCompilation().AddJsonOptions(opt=>
-                opt.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter())
+            services.AddControllersWithViews(options =>
+            {
+                options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(value =>
+                    "Bu alan boþ geçilmemelidir");
+            }).AddRazorRuntimeCompilation().AddJsonOptions(opt =>
+                opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
             ).AddNToastNotifyToastr();
             services.AddSession();
-            services.AddAutoMapper(typeof(CategoryProfile), typeof(CommentProfile) ,typeof(ArticleProfile),typeof(UserProfile), typeof(ViewModelsProfile));
+            services.AddAutoMapper(typeof(CategoryProfile), typeof(CommentProfile), typeof(ArticleProfile), typeof(UserProfile), typeof(ViewModelsProfile));
 
             //Bi<im service/Extensions kýsmýnda oluþturduðumuz dosya. Ýnterface leri vs vermek için.
-            services.LoadMyServices(Configuration.GetConnectionString(name:"LocalDB"));
+            services.LoadMyServices(Configuration.GetConnectionString(name: "LocalDB"));
             services.AddScoped<IImageHelper, ImageHelper>();
             //Cookie bilgilerini veriyoruz.
             services.ConfigureApplicationCookie(options =>
@@ -53,13 +57,13 @@ namespace ProgrammersBlog.Mvc
 
                 options.Cookie = new CookieBuilder
                 {
-                    Name =  "ProgrammersBlog",
+                    Name = "ProgrammersBlog",
                     //Gelen isteklerin sadece http üzerinden olmasýný saðlýyor. Yazýlan js kodu ile cookie bilgilerine ulaþýlmasý engelleniyor bu sayede.
-                    HttpOnly=true,
+                    HttpOnly = true,
                     //Gelen isteklerin sadece kendi ssitemiz üzerinden gelenlerini kabul ediyor. Cookileri ele geçirilen birinin bilgileriyle baþka bir adresden istek gelmesi engelleniyor.
-                    SameSite=SameSiteMode.Strict,
+                    SameSite = SameSiteMode.Strict,
                     //Normalde .Always olmalý gelen bütün istekler https üzerinden olmalý ama geliþtirme aþamasý olduðu için SameAsRequest yaptýk http isteklerinide kabul edecek.
-                    SecurePolicy=CookieSecurePolicy.SameAsRequest,
+                    SecurePolicy = CookieSecurePolicy.SameAsRequest,
                 };
                 //Kullanýcý giriþ yaptýktan sonra belirle süre hesabý açýk kalacak mý ne kadar açýk kalacak. 7 gün yaptýk.
                 options.SlidingExpiration = true;
@@ -100,9 +104,9 @@ namespace ProgrammersBlog.Mvc
             {
                 //Admin area ile article sayfasýna girdiðimizde articels üzerinde deðiþiklik yapabileceðiz. Fakat normal kullanýcý girdiðinde sadece okuyabilecek.
                 endpoints.MapAreaControllerRoute(
-                    name:"Admin",
-                    areaName:"Admin",
-                    pattern:"Admin/{controller=Home}/{action=Index}/{id?}"
+                    name: "Admin",
+                    areaName: "Admin",
+                    pattern: "Admin/{controller=Home}/{action=Index}/{id?}"
                     );
                 //Baþlangýçta home indexinden açýlýþý saðlýyor.
                 endpoints.MapDefaultControllerRoute();

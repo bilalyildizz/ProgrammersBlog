@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using ProgrammersBlog.Data.Abstract;
 using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Entities.Dtos;
@@ -16,18 +17,18 @@ using ProgrammersBlog.Shared.Utilities.Results.Concrete;
 
 namespace ProgrammersBlog.Services.Concrete
 {
-    public class ArticleManager:ManagerBase,IArticleService
+    public class ArticleManager : ManagerBase, IArticleService
     {
-       
 
-        public ArticleManager(IUnitOfWork unitOfWork, IMapper mapper):base(mapper,unitOfWork)
+
+        public ArticleManager(IUnitOfWork unitOfWork, IMapper mapper) : base(mapper, unitOfWork)
         {
-            
+
         }
 
         public async Task<IDataResult<ArticleDto>> GetAsync(int articleId)
         {
-            var article = await  UnitOfWork.Articles.GetAsync(a => a.Id == articleId, ar => ar.Category, ar => ar.User);
+            var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId, ar => ar.Category, ar => ar.User, ar => ar.Comments);
             if (article != null)
             {
 
@@ -38,7 +39,7 @@ namespace ProgrammersBlog.Services.Concrete
                 });
             }
 
-            return new DataResult<ArticleDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural:false), null);
+            return new DataResult<ArticleDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: false), null);
 
         }
 
@@ -62,7 +63,7 @@ namespace ProgrammersBlog.Services.Concrete
             var articles = await UnitOfWork.Articles.GetAllAsync(null, ar => ar.Category, ar => ar.User);
             if (articles.Count > -1)
             {
-                return new DataResult<ArticleListDto>(ResultStatus.Success,new ArticleListDto
+                return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
                 {
                     Articles = articles,
                     ResultStatus = ResultStatus.Success
@@ -89,7 +90,22 @@ namespace ProgrammersBlog.Services.Concrete
 
         public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAndActiveAsync()
         {
-            var articles = await UnitOfWork.Articles.GetAllAsync(a => !a.IsDeleted&&a.IsActive, ar => ar.User, ar => ar.Category);
+            var articles = await UnitOfWork.Articles.GetAllAsync(a => !a.IsDeleted && a.IsActive, ar => ar.User, ar => ar.Category);
+            if (articles.Count > -1)
+            {
+                return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
+                {
+                    Articles = articles,
+                    ResultStatus = ResultStatus.Success
+                });
+            }
+
+            return new DataResult<ArticleListDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: true), null);
+        }
+
+        public async Task<IDataResult<ArticleListDto>> GetAllByDeletedAsync()
+        {
+            var articles = await UnitOfWork.Articles.GetAllAsync(a => a.IsDeleted, ar => ar.User, ar => ar.Category);
             if (articles.Count > -1)
             {
                 return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
@@ -125,7 +141,45 @@ namespace ProgrammersBlog.Services.Concrete
 
         }
 
-        public async Task<IResult> AddAsync(ArticleAddDto articleAddDto, string createdByName,int userId)
+        public async Task<IDataResult<ArticleListDto>> GetAllByViewCountAsync(bool isAscending, int? takeSize)
+        {
+            var articles =
+                await UnitOfWork.Articles.GetAllAsync(a => a.IsActive && !a.IsDeleted, a => a.Category, a => a.User);
+            var sortedArticle = isAscending
+                ? articles.OrderBy(a => a.ViewCount)
+                : articles.OrderByDescending(a => a.ViewCount);
+            return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
+            {
+                ResultStatus = ResultStatus.Success,
+                Articles = takeSize == null ? sortedArticle.ToList() : sortedArticle.Take(takeSize.Value).ToList(),
+
+            });
+
+        }
+
+        public async Task<IDataResult<ArticleListDto>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            pageSize = pageSize > 20 ? 20 : pageSize;
+            var articles = categoryId == null
+                ? await UnitOfWork.Articles.GetAllAsync(a => a.IsActive && !a.IsDeleted, a => a.User, a => a.Category)
+                : await UnitOfWork.Articles.GetAllAsync(a => a.IsActive && !a.IsDeleted && a.CategoryId == categoryId, a => a.User, a => a.Category);
+
+            var sortedArticles = isAscending
+                ? articles.OrderBy(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : articles.OrderByDescending(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
+            {
+                Articles = sortedArticles,
+                ResultStatus = ResultStatus.Success,
+                CurrentPage = currentPage,
+                CategoryId = categoryId ==null ? null : categoryId.Value,
+                TotalCount = articles.Count,
+                PageSize = pageSize,
+                IsAscending=isAscending
+            });
+        }
+
+        public async Task<IResult> AddAsync(ArticleAddDto articleAddDto, string createdByName, int userId)
         {
             var article = Mapper.Map<Article>(articleAddDto);
             article.CreatedByName = createdByName;
@@ -138,7 +192,7 @@ namespace ProgrammersBlog.Services.Concrete
 
         public async Task<IResult> UpdateAsync(ArticleUpdateDto articleAUpdateDto, string modifiedByName)
         {
-            var oldArticle = await UnitOfWork.Articles.GetAsync(a=>a.Id==articleAUpdateDto.Id);
+            var oldArticle = await UnitOfWork.Articles.GetAsync(a => a.Id == articleAUpdateDto.Id);
             var article = Mapper.Map<ArticleUpdateDto, Article>(articleAUpdateDto, oldArticle);
             article.ModifiedByName = modifiedByName;
             await UnitOfWork.Articles.UpdateAsync(article);
@@ -153,16 +207,34 @@ namespace ProgrammersBlog.Services.Concrete
             {
                 var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId);
                 article.IsDeleted = true;
+                article.IsActive = false;
                 article.ModifiedByName = modifiedByName;
-                article.ModifiedDate=DateTime.Now;
+                article.ModifiedDate = DateTime.Now;
                 await UnitOfWork.Articles.UpdateAsync(article);
                 await UnitOfWork.SaveAsync();
                 return new Result(ResultStatus.Success, Messages.Article.Delete(article.Title));
             }
-            return new Result(ResultStatus.Success, Messages.Article.NotFound(isPlural:false));
+            return new Result(ResultStatus.Success, Messages.Article.NotFound(isPlural: false));
         }
 
-        public async  Task<IResult> HardDeleteAsync(int articleId)
+        public async Task<IResult> UndoDeleteAsync(int articleId, string modifiedByName)
+        {
+            var result = await UnitOfWork.Articles.AnyAsync(a => a.Id == articleId);
+            if (result)
+            {
+                var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId);
+                article.IsDeleted = false;
+                article.IsActive = true;
+                article.ModifiedByName = modifiedByName;
+                article.ModifiedDate = DateTime.Now;
+                await UnitOfWork.Articles.UpdateAsync(article);
+                await UnitOfWork.SaveAsync();
+                return new Result(ResultStatus.Success, Messages.Article.UndoDelete(article.Title));
+            }
+            return new Result(ResultStatus.Success, Messages.Article.NotFound(isPlural: false));
+        }
+
+        public async Task<IResult> HardDeleteAsync(int articleId)
         {
             var result = await UnitOfWork.Articles.AnyAsync(a => a.Id == articleId);
             if (result)
@@ -191,7 +263,7 @@ namespace ProgrammersBlog.Services.Concrete
 
         public async Task<IDataResult<int>> CountByNonDeleted()
         {
-            var articlesCount = await UnitOfWork.Articles.CountAsync(a=>!a.IsDeleted);
+            var articlesCount = await UnitOfWork.Articles.CountAsync(a => !a.IsDeleted);
             if (articlesCount > -1)
             {
                 return new DataResult<int>(ResultStatus.Success, articlesCount);

@@ -118,6 +118,20 @@ namespace ProgrammersBlog.Services.Concrete
             return new DataResult<CategoryListDto>(ResultStatus.Error, Messages.Category.NotFound(isPlural: true), null);
         }
 
+        public async Task<IDataResult<CategoryListDto>> GetAllByDeletedAsync()
+        {
+            var categories = await UnitOfWork.Categories.GetAllAsync(c =>c.IsDeleted);
+            if (categories.Count > -1)
+            {
+                return new DataResult<CategoryListDto>(ResultStatus.Success, new CategoryListDto
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Categories = categories
+                });
+            }
+            return new DataResult<CategoryListDto>(ResultStatus.Error, Messages.Category.NotFound(isPlural: true), null);
+        }
+
         public async Task<IDataResult<CategoryDto>> AddAsync(CategoryAddDto categoryAddDto, string createdByName)
         {
 
@@ -165,6 +179,7 @@ namespace ProgrammersBlog.Services.Concrete
             {
                 var category = await UnitOfWork.Categories.GetAsync(a => a.Id == categoryId);
                 category.IsDeleted = true;
+                category.IsActive = false;
                 category.ModifiedByName = modifiedByName;
                 category.ModifiedDate = DateTime.Now;
                 var deletedCategory = await UnitOfWork.Categories.UpdateAsync(category);
@@ -175,6 +190,35 @@ namespace ProgrammersBlog.Services.Concrete
                         Category = deletedCategory,
                         ResultStatus = ResultStatus.Success,
                         Message = Messages.Category.Delete(deletedCategory.Name)
+                    });
+            }
+
+            return new DataResult<CategoryDto>(ResultStatus.Error, Messages.Category.NotFound(isPlural: false), new CategoryDto
+            {
+                Category = null,
+                ResultStatus = ResultStatus.Error,
+                Message = Messages.Category.NotFound(isPlural: false)
+            });
+        }
+
+        public async Task<IDataResult<CategoryDto>> UndoDeleteAsync(int categoryId, string modifiedByName)
+        {
+            var result = await UnitOfWork.Categories.AnyAsync(a => a.Id == categoryId);
+            if (result)
+            {
+                var category = await UnitOfWork.Categories.GetAsync(a => a.Id == categoryId);
+                category.IsDeleted = false;
+                category.IsActive = true;
+                category.ModifiedByName = modifiedByName;
+                category.ModifiedDate = DateTime.Now;
+                var deletedCategory = await UnitOfWork.Categories.UpdateAsync(category);
+                await UnitOfWork.SaveAsync();
+                return new DataResult<CategoryDto>(ResultStatus.Success,
+                    Messages.Category.Delete(deletedCategory.Name), new CategoryDto()
+                    {
+                        Category = deletedCategory,
+                        ResultStatus = ResultStatus.Success,
+                        Message = Messages.Category.UndoDelete(deletedCategory.Name)
                     });
             }
 

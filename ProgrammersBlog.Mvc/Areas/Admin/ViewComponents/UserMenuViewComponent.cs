@@ -21,9 +21,11 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.ViewComponents
             _userManager = userManager;
         }
 
-        public ViewViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user == null)
+                return Content("Kullanıcı Bulunamadı");
             return View(new UserViewModel
             {
                 User=user

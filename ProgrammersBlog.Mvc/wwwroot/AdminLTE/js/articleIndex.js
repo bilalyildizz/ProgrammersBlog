@@ -15,12 +15,7 @@
                 },
                 className: 'btn btn-success',
                 action: function (e, dt, node, config) {
-                    //İÇinde bulunduğumuz sayfanın url sini alıyor.
-                    let url = window.location.href;
-                    //Url Article/Add olmalı Add sayfasına gitmek için. Eğer Article/Index ise addd eklemeden index kelimesini kaldırıyoruz.
-                    url = url.replace("/Index", "");
-                    //Verilen url ye gitmeyi sağlıyor.
-                    window.open(`${url}/Add`, "_self");
+                   
                 }
             },
             {
@@ -39,14 +34,14 @@
                             const articlesResult = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(articlesResult);
-                            if (articlesResult.Result.Data.ResultStatus === 0) {
+                            if (articlesResult.Data.ResultStatus === 0) {
                                 let categoriesArray = [];
-                                $.each(articlesResult.Result.Data.Articles.$values,
+                                $.each(articlesResult.Data.Articles.$values,
                                     function (index, article) {
                                         //site.js içerisinde biz tanımladık bu fonksiyonu çünkü article nesnesi içerisindeki category referansını getirdiğimizde
                                         //sadece listenin 1.categorisinin bilgilerii getiriyor. Diğer elemanları referans gösteren değeri getiriyor sadece.
                                         //Bu fonksiyon ile listenin diğer elemanlarınında değerlerine ulaşabiliyoruz. fonksiyon child ve parent değerleri istiyor.
-                                        const newArticle = getJsonNetObject(article, articlesResult.Result.Data.Articles.$values);
+                                        const newArticle = getJsonNetObject(article, articlesResult.Data.Articles.$values);
                                         let newCategory = getJsonNetObject(newArticle.Category, newArticle);
                                         if (newCategory !== null) {
                                             categoriesArray.push(newCategory);
@@ -72,7 +67,7 @@
                                             `${convertToShortDate(newArticle.ModifiedDate)}`,
                                             newArticle.ModifiedByName,
                                             `
-                                <button class="btn btn-primary btn-sm btn-update" data-id="${newArticle.Id}"><span class="fas fa-edit"></span></button>
+                                <a class="btn btn-primary btn-sm btn-update" href="/Admin/Article/Update?articleId=${newArticle.Id}"><span class="fas fa-edit"></span></a>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="${newArticle.Id}"><span class="fas fa-minus-circle"></span></button>
                                             `
                                         ]).node();

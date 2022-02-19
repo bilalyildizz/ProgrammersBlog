@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -176,6 +177,52 @@ namespace ProgrammersBlog.Services.Concrete
                 TotalCount = articles.Count,
                 PageSize = pageSize,
                 IsAscending=isAscending
+            });
+        }
+
+        public async Task<IDataResult<ArticleListDto>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            pageSize = pageSize > 20 ? 20 : pageSize;
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                var articles =
+                    await UnitOfWork.Articles.GetAllAsync(a => a.IsActive && !a.IsDeleted, a => a.User,
+                        a => a.Category);
+                 
+
+                var sortedArticles = isAscending
+                    ? articles.OrderBy(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                    : articles.OrderByDescending(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+                return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
+                {
+                    Articles = sortedArticles,
+                    ResultStatus = ResultStatus.Success,
+                    CurrentPage = currentPage,
+                    TotalCount = articles.Count,
+                    PageSize = pageSize,
+                    IsAscending = isAscending
+                });
+            }
+
+            var searchedArticles = await UnitOfWork.Articles.SearchAsync(new List<Expression<Func<Article, bool>>>
+            {
+                a=>a.Title.Contains(keyword),
+                a=>a.Category.Name.Contains(keyword),
+                a=>a.SeoDescription.Contains(keyword),
+                a=>a.SeoTags.Contains(keyword)
+            }, a=>a.User, a=>a.User);
+
+            var searchedAndSortedArticles = isAscending
+                ? searchedArticles.OrderBy(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : searchedArticles.OrderByDescending(a => a.Date).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
+            {
+                Articles = searchedAndSortedArticles,
+                ResultStatus = ResultStatus.Success,
+                CurrentPage = currentPage,
+                TotalCount = searchedArticles.Count,
+                PageSize = pageSize,
+                IsAscending = isAscending
             });
         }
 

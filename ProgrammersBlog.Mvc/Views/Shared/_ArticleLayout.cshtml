@@ -16,6 +16,10 @@
 
     <!-- Custom styles for this template -->
     <link href="~/BlogHome/css/blog-home.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+    <link href="~/BlogHome/css/site.css" rel="stylesheet">
+
 
 </head>
 
@@ -56,7 +60,7 @@
            @RenderBody()
 
             <!-- Sidebar Widgets Column -->
-            @await Component.InvokeAsync("RightSideBar")
+          
 
         </div>
         <!-- /.row -->
@@ -73,8 +77,11 @@
 
     <!-- Bootstrap core JavaScript -->
     <script src="~/BlogHome/vendor/jquery/jquery.min.js"></script>
-    <script src="~/BlogHome/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    @RenderSectionAsync("Scripts", false)
+<script src="~/BlogHome/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"></script>
+
+
+    @await RenderSectionAsync("Scripts", false)
 </body>
 
 </html>

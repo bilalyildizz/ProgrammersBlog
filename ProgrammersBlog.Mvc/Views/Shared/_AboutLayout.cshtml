@@ -1,22 +1,13 @@
-﻿@*App settingse değerlerini girdiğimiz Websiteınfo sınıfnı bu şekilde kullanıyoruz.*@
-@using Microsoft.Extensions.Options 
-@using ProgrammersBlog.Entities.Concrete
-
-@inject IOptions<WebsiteInfo> WebsiteInfo
-@{
-    var websiteInfo = WebsiteInfo.Value;
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 
 <head>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="@websiteInfo.SeoDescription">
-    <meta name="author" content="@websiteInfo.SeoAuthor">
-    <meta name="keywords" content="@websiteInfo.SeoTags">
-
+    <meta name="description" content="@ViewBag.Description">
+    <meta name="author" content="@ViewBag.Author">
+    <meta name="keywords" content="@ViewBag.Tags">
 
     <title>@ViewBag.Title | ProgrammersBlog</title>
 
@@ -27,6 +18,7 @@
     <link href="~/BlogHome/css/blog-home.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+    <link href="~/BlogHome/css/site.css" rel="stylesheet">
 
 
 </head>
@@ -36,7 +28,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">@websiteInfo.MenuTitle</a>
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">ProgrammersBlog</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -68,7 +60,7 @@
             @RenderBody()
 
             <!-- Sidebar Widgets Column -->
-            @await Component.InvokeAsync("RightSideBar")
+
 
         </div>
         <!-- /.row -->
@@ -85,11 +77,11 @@
 
     <!-- Bootstrap core JavaScript -->
     <script src="~/BlogHome/vendor/jquery/jquery.min.js"></script>
-<script src="~/BlogHome/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"></script>
+    <script src="~/BlogHome/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"></script>
+
 
     @await RenderSectionAsync("Scripts", false)
-
 </body>
 
 </html>

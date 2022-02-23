@@ -65,6 +65,10 @@ namespace ProgrammersBlog.Services.Utilities
             {
                 return $"{articleTitle} başlıklı makale başarıyla veritabanından silinmiştir.";
             }
+            public static string IncreaseViewCount(string articleTitle)
+            {
+                return $"{articleTitle} başlıklı makalenin okunam sayısı arttırılmıştır.";
+            }
         }
         public static class Comment
         {

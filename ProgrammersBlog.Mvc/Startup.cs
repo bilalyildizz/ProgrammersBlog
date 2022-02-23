@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ProgrammersBlog.Data.Concrete.EntityFramework.Contexts;
+using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Mvc.AutoMapper.Profiles;
 using ProgrammersBlog.Mvc.Helpers;
 using ProgrammersBlog.Mvc.Helpers.Abstract;
@@ -33,6 +34,10 @@ namespace ProgrammersBlog.Mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Bu konfiürasyon ile oluþturduðumuz sýnýfýn deðerlerini appsettingsde atayýp kullanabiliyoruz.
+            services.Configure<AboutUsPageInfo>(Configuration.GetSection("AboutUsPageInfo"));
+            services.Configure<WebsiteInfo>(Configuration.GetSection("WebsiteInfo"));
+
             //mvc uygulamasý olduðunu bu kod ile belirtiyoruz.
             //Add json options ekleme nedenimiz controllerdan  viewa model dönerken javascriptin bu modeli tanýmasý için json formata çevirmemiz gerekmesi.
             services.AddControllersWithViews(options =>

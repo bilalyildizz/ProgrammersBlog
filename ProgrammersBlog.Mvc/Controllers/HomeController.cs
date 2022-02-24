@@ -47,6 +47,7 @@ namespace ProgrammersBlog.Mvc.Controllers
         [HttpPost]
         public IActionResult Contact(EmailSendDto emailSendDto)
         {
+            //Daha sonra ilerlenicek
             return View();
 
         }

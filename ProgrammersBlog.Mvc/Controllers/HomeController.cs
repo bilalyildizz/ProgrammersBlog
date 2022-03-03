@@ -3,11 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
+using NToastNotify;
 using ProgrammersBlog.Data.Concrete;
 using ProgrammersBlog.Entities.Concrete;
 using ProgrammersBlog.Entities.Dtos;
 using ProgrammersBlog.Services.Abstract;
+using ProgrammersBlog.Shared.Utilities.Helpers.Abstract;
 
 namespace ProgrammersBlog.Mvc.Controllers
 {
@@ -15,17 +18,24 @@ namespace ProgrammersBlog.Mvc.Controllers
     {
         private readonly IArticleService _articleService;
         private readonly AboutUsPageInfo _aboutUsPageInfo;
-        public HomeController(IArticleService articleService, IOptions<AboutUsPageInfo> aboutUsPageInfo)
+        private readonly IMailService _mailService;
+        private readonly IToastNotification _toastNotification;
+        private readonly IWritableOptions<AboutUsPageInfo> _aboutUsPageInfoWriter;
+        public HomeController(IArticleService articleService, IOptionsSnapshot<AboutUsPageInfo> aboutUsPageInfo, IMailService mailService, IToastNotification toastNotification, IWritableOptions<AboutUsPageInfo> aboutUsPageInfoWriter)
         {
             _articleService = articleService;
+            _mailService = mailService;
+            _toastNotification = toastNotification;
+            _aboutUsPageInfoWriter = aboutUsPageInfoWriter;
+
             _aboutUsPageInfo = aboutUsPageInfo.Value;
         }
 
-        public async Task<IActionResult> Index(int? categoryId, int currentPage = 1, int pageSize = 5,bool isAscending=false)
+        public async Task<IActionResult> Index(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             var articlesResult = await (categoryId == null
-                ? _articleService.GetAllByPagingAsync(null, currentPage, pageSize,isAscending)
-                : _articleService.GetAllByPagingAsync(categoryId, currentPage, pageSize,isAscending));
+                ? _articleService.GetAllByPagingAsync(null, currentPage, pageSize, isAscending)
+                : _articleService.GetAllByPagingAsync(categoryId, currentPage, pageSize, isAscending));
 
             return View(articlesResult.Data);
 
@@ -33,8 +43,8 @@ namespace ProgrammersBlog.Mvc.Controllers
         [HttpGet]
         public IActionResult About()
         {
-            throw new Exception("Hata!");
-        //appsetting içerisinde _aboutUsPageInfo değerlerini atadık.
+          
+            //appsetting içerisinde _aboutUsPageInfo değerlerini atadık.
             return View(_aboutUsPageInfo);
 
         }
@@ -47,8 +57,18 @@ namespace ProgrammersBlog.Mvc.Controllers
         [HttpPost]
         public IActionResult Contact(EmailSendDto emailSendDto)
         {
-            //Daha sonra ilerlenicek
-            return View();
+            if (ModelState.IsValid)
+            {
+                var result = _mailService.SendContactEmail(emailSendDto);
+                _toastNotification.AddSuccessToastMessage(result.Message, new ToastrOptions
+                {
+                    Title = "Başarılı İşlem"
+                });
+                return View();
+            }
+
+
+            return View(emailSendDto);
 
         }
     }

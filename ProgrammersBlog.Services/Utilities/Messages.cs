@@ -7,6 +7,13 @@ namespace ProgrammersBlog.Services.Utilities
 {
     public static class Messages
     {
+        public static class General
+        {
+            public static string ValidationError()
+            {
+                return $"Bir veya daha fazla validation hatası ile karşılaşıldı";
+            }
+        }
         public static class Category
         {
             public static string NotFound(bool isPlural)
@@ -14,6 +21,12 @@ namespace ProgrammersBlog.Services.Utilities
                 if (isPlural) return "Hiçbir kategori bulunamadı.";
                 return "Bu isimde bir kategori bulunamadı.";
             }
+            public static string NotFoundById(int categoryId)
+            {
+
+                return $"{categoryId} kategori koduna ait bir kategori bulunamadı.";
+            }
+
 
             public static string Add(string categoryName)
             {
@@ -43,6 +56,11 @@ namespace ProgrammersBlog.Services.Utilities
             {
                 if (isPlural) return "Hiçbir makale bulunamadı.";
                 return "Bu isimde bir makale bulunamadı.";
+            }
+            public static string NotFoundById(int articleId)
+            {
+
+                return $"{articleId} makale koduna ait bir makale bulunamadı.";
             }
 
             public static string Add(string articleTitle)
@@ -104,6 +122,44 @@ namespace ProgrammersBlog.Services.Utilities
             {
                 return $"{createdByName} tarafından eklenen yorum başarıyla veritabanından silinmiştir.";
             }
+        }
+        public static class User
+        {
+            //public static string NotFound(bool isPlural)
+            //{
+            //    if (isPlural) return "Hiçbir makale bulunamadı.";
+            //    return "Bu isimde bir makale bulunamadı.";
+            //}
+            public static string NotFoundById(int userId)
+            {
+
+                return $"{userId} kullanıcı koduna ait bir kulanıcı bulunamadı.";
+            }
+
+            //public static string Add(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makale başarıyla eklenmiştir.";
+            //}
+            //public static string Update(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makale başarıyla güncellenmiştir.";
+            //}
+            //public static string Delete(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makale başarıyla silinmiştir.";
+            //}
+            //public static string UndoDelete(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makale başarıyla arşivden getirilmiştir";
+            //}
+            //public static string HardDelete(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makale başarıyla veritabanından silinmiştir.";
+            //}
+            //public static string IncreaseViewCount(string articleTitle)
+            //{
+            //    return $"{articleTitle} başlıklı makalenin okunam sayısı arttırılmıştır.";
+            //}
         }
     }
 }

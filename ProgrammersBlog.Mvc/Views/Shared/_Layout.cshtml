@@ -2,7 +2,7 @@
 @using Microsoft.Extensions.Options 
 @using ProgrammersBlog.Entities.Concrete
 
-@inject IOptions<WebsiteInfo> WebsiteInfo
+@inject IOptionsSnapshot<WebsiteInfo> WebsiteInfo
 @{
     var websiteInfo = WebsiteInfo.Value;
 }

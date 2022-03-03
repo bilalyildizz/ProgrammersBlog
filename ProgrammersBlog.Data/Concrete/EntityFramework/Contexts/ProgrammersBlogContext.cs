@@ -21,6 +21,7 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Contexts
        public DbSet<Comment> Comments { get; set; }
        public DbSet<Role> Roles { get; set; }
        public DbSet<User> Users { get; set; }
+       public DbSet<User> Logs { get; set; }
 
         //       protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //       {//@ çift tırnak içerisindeki her şeyin string olarak algılanmasını sağlıyor.
@@ -45,6 +46,7 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Contexts
            modelBuilder.ApplyConfiguration(new UserLoginMap());
            modelBuilder.ApplyConfiguration(new UserRoleMap());
            modelBuilder.ApplyConfiguration(new UserTokenMap());
+           modelBuilder.ApplyConfiguration(new LogMap());
 
 
 

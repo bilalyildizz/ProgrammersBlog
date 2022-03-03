@@ -2,7 +2,7 @@
 @using Microsoft.Extensions.Options 
 @using ProgrammersBlog.Entities.Concrete
 
-@inject IOptions<WebsiteInfo> WebsiteInfo
+@inject IOptionsSnapshot<WebsiteInfo> WebsiteInfo
 @{
     var websiteInfo = WebsiteInfo.Value;
 }
@@ -28,6 +28,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="Home" asp-action="Contact">İletişim</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Home" asp-action="Index">Yönetim Paneli</a>
                 </li>
             </ul>
         </div>

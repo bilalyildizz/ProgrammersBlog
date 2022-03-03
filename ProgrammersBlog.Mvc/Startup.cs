@@ -20,6 +20,7 @@ using ProgrammersBlog.Mvc.Helpers.Abstract;
 using ProgrammersBlog.Mvc.Helpers.Concrete;
 using ProgrammersBlog.Services.AutoMapper.Profiles;
 using ProgrammersBlog.Services.Extensions;
+using ProgrammersBlog.Shared.Utilities.Extensions;
 
 namespace ProgrammersBlog.Mvc
 {
@@ -38,6 +39,12 @@ namespace ProgrammersBlog.Mvc
             //Bu konfiürasyon ile oluþturduðumuz sýnýfýn deðerlerini appsettingsde atayýp kullanabiliyoruz.
             services.Configure<AboutUsPageInfo>(Configuration.GetSection("AboutUsPageInfo"));
             services.Configure<WebsiteInfo>(Configuration.GetSection("WebsiteInfo"));
+            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            services.Configure<ArticleRightSideBarWidgetOptions>(Configuration.GetSection("ArticleRightSideBarWidgetOptions"));
+            services.ConfigureWritable<AboutUsPageInfo>(Configuration.GetSection("AboutUsPageInfo"));
+            services.ConfigureWritable<WebsiteInfo>(Configuration.GetSection("WebsiteInfo"));
+            services.ConfigureWritable<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            services.ConfigureWritable<ArticleRightSideBarWidgetOptions>(Configuration.GetSection("ArticleRightSideBarWidgetOptions"));
 
             //mvc uygulamasý olduðunu bu kod ile belirtiyoruz.
             //Add json options ekleme nedenimiz controllerdan  viewa model dönerken javascriptin bu modeli tanýmasý için json formata çevirmemiz gerekmesi.

@@ -1,5 +1,5 @@
 # ProgrammersBlog
-- Bu adresden siteye bakabilirsiniz : http://enicma.somee.com/  Test Kullanıcı Adı: test@gmail.com  Şifre: 12345   
+- Bu adresden siteye bakabilirsiniz : https://enicmatech.com/  Test Kullanıcı Adı: test@gmail.com  Şifre: 12345   
 - Yazılımcıların en güncel bilgileri öğrenebileceği blog sitesi.
 - Udemy eğitimimle beraber ilerlettiğim ASP.NET CORE MVC Projesi.
 - Proje boyunca kullanılan mimari yaklaşım ve teknik ve konseptler şunlardır.
